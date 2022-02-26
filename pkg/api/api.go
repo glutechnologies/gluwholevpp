@@ -9,9 +9,10 @@ import (
 )
 
 type Api struct {
-	router  http.Handler
-	storage repository.Storage
-	vpp     vpp.Client
+	router       http.Handler
+	storage      repository.Storage
+	vpp          vpp.Client
+	srcInterface int
 }
 
 type Server interface {
@@ -19,8 +20,8 @@ type Server interface {
 	Close() error
 }
 
-func New() Server {
-	a := &Api{}
+func New(vppEnabled bool, srcInterface int, srcDatabase string) Server {
+	a := &Api{srcInterface: srcInterface}
 	r := mux.NewRouter()
 
 	// Add endpoints
@@ -28,11 +29,11 @@ func New() Server {
 	r.HandleFunc("/bitstream", a.CreateBitstreamHandler).Methods(http.MethodPost)
 
 	// Init DB
-	a.storage.Init("data.db")
+	a.storage.Init(srcDatabase)
 	a.storage.OpenDB()
 
 	// Init VPP
-	a.vpp.Init("/var/run/vpp/api.sock")
+	a.vpp.Init("/var/run/vpp/api.sock", vppEnabled)
 
 	a.router = r
 	return a

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -18,8 +17,6 @@ func (s *Storage) Init(filename string) {
 
 func (s *Storage) OpenDB() error {
 	db, err := sql.Open("sqlite3", s.filename)
-
-	checkErr(err)
 	s.db = db
 
 	return err
@@ -27,8 +24,4 @@ func (s *Storage) OpenDB() error {
 
 func (s *Storage) CloseDB() error {
 	return s.db.Close()
-}
-
-func checkErr(err error) {
-	fmt.Println(err)
 }

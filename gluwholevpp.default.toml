@@ -1,0 +1,7 @@
+SrcDatabase = "/etc/gluwholevpp/data.db"
+Port = 8080
+Address = "0.0.0.0"
+SrcInterface = 1
+# Set VppEnabled to false for development purposes only
+VppEnabled = true
+SrcVppSocket = "/var/run/vpp/api.sock"

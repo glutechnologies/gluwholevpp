@@ -1,10 +1,10 @@
 package repository
 
 type Customer struct {
-	Id             int    `json:"id"`
-	OuterInterface string `json:"outer-interface"`
-	OuterVlan      int    `json:"outer-vlan"`
-	Counter        int    `json:"counter"`
+	Id             int `json:"id"`
+	OuterInterface int `json:"outer-interface"`
+	OuterVlan      int `json:"outer-vlan"`
+	Counter        int `json:"counter"`
 }
 
 func (s *Storage) GetCustomers(customers *[]Customer) error {
@@ -15,7 +15,7 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 	}
 
 	var id int
-	var outerInterface string
+	var outerInterface int
 	var outerVlan int
 	var counter int
 
@@ -24,7 +24,6 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 		if err != nil {
 			return err
 		}
-		checkErr(err)
 		(*customers) = append((*customers), Customer{Id: id, OuterInterface: outerInterface,
 			OuterVlan: outerVlan, Counter: counter})
 	}
@@ -34,16 +33,16 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 
 func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 	var id int
-	var outerInterface string
+	var outerInterface int
 	var outerVlan int
 	var counter int
-	err := s.db.QueryRow("SELECT Id, OuterInterface, OuterVlan, Counter FROM customers WHERE Id = ?", id).Scan(&id, &outerInterface, &outerVlan, &counter)
+	err := s.db.QueryRow("SELECT Id, OuterInterface, OuterVlan, Counter FROM customers WHERE Id = ?", customerId).Scan(&id, &outerInterface, &outerVlan, &counter)
 
 	if err != nil {
 		return err
 	}
 
-	customer = &Customer{
+	(*customer) = Customer{
 		Id:             id,
 		OuterInterface: outerInterface,
 		OuterVlan:      outerVlan,
@@ -53,25 +52,26 @@ func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 	return nil
 }
 
-func (s *Storage) IncrementCounterCustomer(customerId int, counter *int) error {
+func (s *Storage) IncrementCounterCustomer(customerId int) (int, error) {
+	var counter int
 	tx, _ := s.db.Begin()
 	err := tx.QueryRow("SELECT Counter FROM customers WHERE Id = ?", customerId).Scan(&counter)
 
 	if err != nil {
 		tx.Rollback()
-		return err
+		return counter, err
 	}
 
-	_, err = tx.Exec("UPDATE customers SET Counter = ?", (*counter)+1)
+	_, err = tx.Exec("UPDATE customers SET Counter = ?", counter+1)
 
 	if err != nil {
 		tx.Rollback()
-		return err
+		return counter, err
 	}
 
 	defer tx.Commit()
 
-	return nil
+	return counter, nil
 }
 
 func (s *Storage) InsertCustomer(customer *Customer) error {

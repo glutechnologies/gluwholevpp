@@ -34,7 +34,6 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 		if err != nil {
 			return err
 		}
-		checkErr(err)
 		(*bitstreams) = append((*bitstreams), Bitstream{Id: id, CustomerId: customerId, SrcId: srcId, SrcOuter: srcOuter,
 			SrcInner: srcInner, DstId: dstId, DstOuter: dstOuter, DstInner: dstInner, Comment: comment})
 	}
@@ -43,12 +42,12 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 }
 
 func (s *Storage) InsertBitstream(bitstream *Bitstream) error {
-	stmt, err := s.db.Prepare("INSERT INTO bitstreams (Id, CustomerId, SrcOuter, SrcInner, DstOuter, DstInner, Comment) VALUES (?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO bitstreams (Id, CustomerId, SrcId, SrcOuter, SrcInner, DstId, DstOuter, DstInner, Comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 
-	stmt.Exec(bitstream.Id, bitstream.CustomerId, bitstream.SrcOuter, bitstream.SrcInner, bitstream.DstOuter, bitstream.DstInner, bitstream.Comment)
+	stmt.Exec(bitstream.Id, bitstream.CustomerId, bitstream.SrcId, bitstream.SrcOuter, bitstream.SrcInner, bitstream.DstId, bitstream.DstOuter, bitstream.DstInner, bitstream.Comment)
 	defer stmt.Close()
 
 	return nil

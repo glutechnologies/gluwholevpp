@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"gluwholevpp/pkg/repository"
 	"gluwholevpp/pkg/utils"
+	"gluwholevpp/pkg/vpp"
 	"net/http"
 )
 
@@ -44,9 +45,7 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 		writeHttpResponseJSON(res, &w, 400)
 		return
 	}
-
-	var counter int
-	err = a.storage.IncrementCounterCustomer(bitstream.CustomerId, &counter)
+	counter, err := a.storage.IncrementCounterCustomer(bitstream.CustomerId)
 
 	if err != nil {
 		res.Msg = err.Error()
@@ -69,7 +68,18 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.vpp.CreateBitstream(bitstream.SrcId, bitstream.DstId, bitstream.SrcInner, bitstream.SrcOuter, bitstream.DstOuter, bitstream.DstInner)
+	vppBitstream := &vpp.Bitstream{
+		SrcInterface: a.srcInterface,
+		DstInterface: customer.OuterInterface,
+		SrcId:        bitstream.SrcId,
+		DstId:        bitstream.DstId,
+		SrcOuter:     bitstream.SrcOuter,
+		SrcInner:     bitstream.SrcInner,
+		DstOuter:     bitstream.DstOuter,
+		DstInner:     bitstream.DstInner,
+	}
+
+	a.vpp.CreateBitstream(vppBitstream)
 
 	res.Status = 1
 	res.Msg = "Ok"

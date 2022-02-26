@@ -9,13 +9,32 @@ import (
 	"git.fd.io/govpp.git/core"
 )
 
+type Bitstream struct {
+	SrcInterface int
+	DstInterface int
+	SrcId        int
+	DstId        int
+	SrcOuter     int
+	SrcInner     int
+	DstOuter     int
+	DstInner     int
+}
+
 type Client struct {
 	sockAddr string
 	conn     *core.Connection
+	enabled  bool
 }
 
-func (c *Client) Init(sockAddr string) {
+func (c *Client) Init(sockAddr string, enabled bool) {
+	// Initialize all struct members
 	c.sockAddr = sockAddr
+	c.enabled = enabled
+
+	// If vpp is not enabled return
+	if !c.enabled {
+		return
+	}
 
 	conn, connEv, err := govpp.AsyncConnect(sockAddr, core.DefaultMaxReconnectAttempts, core.DefaultReconnectInterval)
 	if err != nil {
@@ -35,12 +54,20 @@ func (c *Client) Close() {
 	c.conn.Disconnect()
 }
 
-func (c *Client) CreateBitstream(srcId int, dstId int, srcOuter int, srcInner int, dstOuter int, dstInner int) {
-	CreateVlan(c.conn, 1, srcId, srcOuter, srcInner)
-	CreateVlan(c.conn, 1, dstId, dstOuter, dstInner)
+func (c *Client) CreateBitstream(bitstream *Bitstream) {
+	// If vpp is not enabled return
+	if !c.enabled {
+		return
+	}
+
+	// Create Src Vlan
+	CreateVlan(c.conn, bitstream.SrcInterface, bitstream.SrcId, bitstream.SrcOuter, bitstream.SrcInner)
+
+	// Create Destination Vlan
+	CreateVlan(c.conn, bitstream.DstInterface, bitstream.DstId, bitstream.DstOuter, bitstream.DstInner)
 }
 
-func CreateVlan(c *core.Connection, sw int, id int, inner int, outer int) {
+func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) {
 	ch, err := c.NewAPIChannel()
 	if err != nil {
 		log.Fatalln("ERROR: creating channel failed:", err)

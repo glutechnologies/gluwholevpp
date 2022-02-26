@@ -19,3 +19,9 @@
 
 # Go workspace file
 go.work
+
+# Development config file
+gluwholevpp.toml
+
+# VPP socket using ssh (Unix socket redirection)
+vpp.sock
