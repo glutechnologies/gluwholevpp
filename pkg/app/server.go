@@ -17,7 +17,7 @@ type Config struct {
 
 func RunHttpServer(config *Config) {
 	// New gluwholevpp API
-	s := api.New(config.VppEnabled, config.SrcInterface, config.SrcDatabase)
+	s := api.New(config.VppEnabled, config.SrcInterface, config.SrcDatabase, config.SrcVppSocket)
 	addr := fmt.Sprintf("%v:%v", config.Address, config.Port)
 
 	fmt.Println("Listening on", addr)

@@ -8,7 +8,7 @@ type Customer struct {
 }
 
 func (s *Storage) GetCustomers(customers *[]Customer) error {
-	rows, err := s.db.Query("SELECT Id, OuterInterface, OuterVlan, Counter FROM customers")
+	rows, err := s.db.Query("SELECT Id, OuterInterface, OuterVlan FROM customers")
 
 	if err != nil {
 		return err
@@ -17,15 +17,14 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 	var id int
 	var outerInterface int
 	var outerVlan int
-	var counter int
 
 	for rows.Next() {
-		err = rows.Scan(&id, &outerInterface, &outerInterface, &outerVlan, &counter)
+		err = rows.Scan(&id, &outerInterface, &outerInterface, &outerVlan)
 		if err != nil {
 			return err
 		}
 		(*customers) = append((*customers), Customer{Id: id, OuterInterface: outerInterface,
-			OuterVlan: outerVlan, Counter: counter})
+			OuterVlan: outerVlan})
 	}
 
 	return nil
@@ -35,8 +34,7 @@ func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 	var id int
 	var outerInterface int
 	var outerVlan int
-	var counter int
-	err := s.db.QueryRow("SELECT Id, OuterInterface, OuterVlan, Counter FROM customers WHERE Id = ?", customerId).Scan(&id, &outerInterface, &outerVlan, &counter)
+	err := s.db.QueryRow("SELECT Id, OuterInterface, OuterVlan FROM customers WHERE Id = ?", customerId).Scan(&id, &outerInterface, &outerVlan)
 
 	if err != nil {
 		return err
@@ -46,7 +44,6 @@ func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 		Id:             id,
 		OuterInterface: outerInterface,
 		OuterVlan:      outerVlan,
-		Counter:        counter,
 	}
 
 	return nil

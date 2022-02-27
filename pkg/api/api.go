@@ -20,7 +20,7 @@ type Server interface {
 	Close() error
 }
 
-func New(vppEnabled bool, srcInterface int, srcDatabase string) Server {
+func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket string) Server {
 	a := &Api{srcInterface: srcInterface}
 	r := mux.NewRouter()
 
@@ -33,7 +33,10 @@ func New(vppEnabled bool, srcInterface int, srcDatabase string) Server {
 	a.storage.OpenDB()
 
 	// Init VPP
-	a.vpp.Init("/var/run/vpp/api.sock", vppEnabled)
+	a.vpp.Init(srcVppSocket, vppEnabled)
+
+	// Load Bitstreams from DB
+	a.LoadBitstreamsStorage()
 
 	a.router = r
 	return a
