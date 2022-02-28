@@ -59,7 +59,7 @@ func (s *Storage) IncrementCounterCustomer(customerId int) (int, error) {
 		return counter, err
 	}
 
-	_, err = tx.Exec("UPDATE customers SET Counter = ?", counter+1)
+	_, err = tx.Exec("UPDATE customers SET Counter = ? WHERE Id = ?", counter+1, customerId)
 
 	if err != nil {
 		tx.Rollback()
