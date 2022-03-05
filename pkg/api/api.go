@@ -28,6 +28,9 @@ func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket str
 	r.HandleFunc("/bitstreams", a.GetBitstreamsHandler).Methods(http.MethodGet)
 	r.HandleFunc("/bitstream", a.CreateBitstreamHandler).Methods(http.MethodPost)
 
+	r.HandleFunc("/customers", a.GetCustomersHandler).Methods(http.MethodGet)
+	r.HandleFunc("/customer", a.CreateCustomerHandler).Methods(http.MethodPost)
+
 	// Init DB
 	a.storage.Init(srcDatabase)
 	a.storage.OpenDB()

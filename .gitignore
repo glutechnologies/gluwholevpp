@@ -25,3 +25,6 @@ gluwholevpp.toml
 
 # VPP socket using ssh (Unix socket redirection)
 vpp.sock
+
+# Build files
+bin/*

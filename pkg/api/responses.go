@@ -46,6 +46,34 @@ func (r *ResponseBitstreams) GetStatus() int {
 	return r.Status
 }
 
+type ResponseCustomers struct {
+	Status int
+	Msg    *[]repository.Customer
+}
+
+func (r *ResponseCustomers) GetMsg() string {
+	res, _ := json.Marshal(r.Msg)
+	return string(res)
+}
+
+func (r *ResponseCustomers) GetStatus() int {
+	return r.Status
+}
+
+type ResponseCustomer struct {
+	Status int
+	Msg    *repository.Customer
+}
+
+func (r *ResponseCustomer) GetMsg() string {
+	res, _ := json.Marshal(r.Msg)
+	return string(res)
+}
+
+func (r *ResponseCustomer) GetStatus() int {
+	return r.Status
+}
+
 func writeHttpResponseJSON(res Response, w *http.ResponseWriter, httpCode int) {
 	r := &ResponseGeneric{}
 	r.Status = res.GetStatus()

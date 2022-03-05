@@ -1,30 +1,33 @@
 package repository
 
 type Customer struct {
-	Id             int `json:"id"`
-	OuterInterface int `json:"outer-interface"`
-	OuterVlan      int `json:"outer-vlan"`
-	Counter        int `json:"counter"`
+	Id             int    `json:"id"`
+	Name           string `json:"name"`
+	OuterInterface int    `json:"outer-interface"`
+	OuterVlan      int    `json:"outer-vlan"`
+	Counter        int    `json:"counter"`
 }
 
 func (s *Storage) GetCustomers(customers *[]Customer) error {
-	rows, err := s.db.Query("SELECT Id, OuterInterface, OuterVlan FROM customers")
+	rows, err := s.db.Query("SELECT Id, Name, OuterInterface, OuterVlan, Counter FROM customers")
 
 	if err != nil {
 		return err
 	}
 
 	var id int
+	var name string
 	var outerInterface int
 	var outerVlan int
+	var counter int
 
 	for rows.Next() {
-		err = rows.Scan(&id, &outerInterface, &outerInterface, &outerVlan)
+		err = rows.Scan(&id, &name, &outerInterface, &outerVlan, &counter)
 		if err != nil {
 			return err
 		}
-		(*customers) = append((*customers), Customer{Id: id, OuterInterface: outerInterface,
-			OuterVlan: outerVlan})
+		(*customers) = append((*customers), Customer{Id: id, Name: name, OuterInterface: outerInterface,
+			OuterVlan: outerVlan, Counter: counter})
 	}
 
 	return nil
@@ -32,9 +35,11 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 
 func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 	var id int
+	var name string
 	var outerInterface int
 	var outerVlan int
-	err := s.db.QueryRow("SELECT Id, OuterInterface, OuterVlan FROM customers WHERE Id = ?", customerId).Scan(&id, &outerInterface, &outerVlan)
+	var counter int
+	err := s.db.QueryRow("SELECT Id, Name, OuterInterface, OuterVlan, Counter FROM customers WHERE Id = ?", customerId).Scan(&id, &name, &outerInterface, &outerVlan, &counter)
 
 	if err != nil {
 		return err
@@ -42,8 +47,10 @@ func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 
 	(*customer) = Customer{
 		Id:             id,
+		Name:           name,
 		OuterInterface: outerInterface,
 		OuterVlan:      outerVlan,
+		Counter:        counter,
 	}
 
 	return nil
@@ -72,12 +79,12 @@ func (s *Storage) IncrementCounterCustomer(customerId int) (int, error) {
 }
 
 func (s *Storage) InsertCustomer(customer *Customer) error {
-	stmt, err := s.db.Prepare("INSERT INTO customers (OuterInterface, OuterVlan, Counter) VALUES (?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO customers (Name, OuterInterface, OuterVlan) VALUES (?, ?, ?)")
 	if err != nil {
 		return err
 	}
 
-	stmt.Exec(customer.OuterInterface, customer.OuterInterface, customer.OuterVlan)
+	stmt.Exec(customer.Name, customer.OuterInterface, customer.OuterVlan)
 	defer stmt.Close()
 
 	return nil

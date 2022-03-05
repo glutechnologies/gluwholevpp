@@ -52,6 +52,11 @@ func (c *Client) Init(sockAddr string, enabled bool) {
 }
 
 func (c *Client) Close() {
+	// If vpp is not enabled return
+	if !c.enabled {
+		return
+	}
+
 	c.conn.Disconnect()
 }
 
@@ -74,7 +79,7 @@ func (c *Client) CreateBitstream(bitstream *Bitstream) {
 func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (interface_types.InterfaceIndex, error) {
 	ch, err := c.NewAPIChannel()
 	if err != nil {
-		log.Fatalln("ERROR: creating channel failed:", err)
+		log.Println("ERROR: creating channel failed:", err)
 		return 0, err
 	}
 	defer ch.Close()
@@ -85,7 +90,7 @@ func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (inter
 	reply := &interfaces.CreateSubifReply{}
 
 	if err = ch.SendRequest(req).ReceiveReply(reply); err != nil {
-		log.Fatalln("ERROR: creating sub-interface", err)
+		log.Println("ERROR: creating sub-interface", err)
 		return 0, err
 	}
 
@@ -94,7 +99,7 @@ func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (inter
 	reply2 := &interfaces.SwInterfaceSetFlagsReply{}
 
 	if err = ch.SendRequest(req2).ReceiveReply(reply2); err != nil {
-		log.Fatalln("ERROR: setting up interface", err)
+		log.Println("ERROR: setting up interface", err)
 		return 0, err
 	}
 
@@ -104,7 +109,7 @@ func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (inter
 func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.InterfaceIndex, sw1 interface_types.InterfaceIndex) error {
 	ch, err := c.NewAPIChannel()
 	if err != nil {
-		log.Fatalln("ERROR: creating channel failed:", err)
+		log.Println("ERROR: creating channel failed:", err)
 		return err
 	}
 	defer ch.Close()
@@ -121,7 +126,7 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	reply := &l2.BridgeDomainAddDelReply{}
 
 	if err = ch.SendRequest(req).ReceiveReply(reply); err != nil {
-		log.Fatalln("ERROR: creating bridge-domain", err)
+		log.Println("ERROR: creating bridge-domain", err)
 		return err
 	}
 
@@ -134,7 +139,7 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	reply2 := &l2.SwInterfaceSetL2BridgeReply{}
 
 	if err = ch.SendRequest(req2).ReceiveReply(reply2); err != nil {
-		log.Fatalln("ERROR: seting sw0 to bridge-domain", err)
+		log.Println("ERROR: seting sw0 to bridge-domain", err)
 		return err
 	}
 
@@ -146,7 +151,7 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	reply3 := &l2.SwInterfaceSetL2BridgeReply{}
 
 	if err = ch.SendRequest(req3).ReceiveReply(reply3); err != nil {
-		log.Fatalln("ERROR: seting sw1 to bridge-domain", err)
+		log.Println("ERROR: seting sw1 to bridge-domain", err)
 		return err
 	}
 
@@ -156,7 +161,7 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	reply4 := &l2.L2InterfaceVlanTagRewriteReply{}
 
 	if err = ch.SendRequest(req4).ReceiveReply(reply4); err != nil {
-		log.Fatalln("ERROR: seting tag rewrite pop2 sw0", err)
+		log.Println("ERROR: seting tag rewrite pop2 sw0", err)
 		return err
 	}
 
@@ -165,7 +170,7 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	reply5 := &l2.L2InterfaceVlanTagRewriteReply{}
 
 	if err = ch.SendRequest(req5).ReceiveReply(reply5); err != nil {
-		log.Fatalln("ERROR: seting tag rewrite pop2 sw1", err)
+		log.Println("ERROR: seting tag rewrite pop2 sw1", err)
 		return err
 	}
 
