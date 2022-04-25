@@ -1,6 +1,7 @@
 package vpp
 
 import (
+	"gluwholevpp/pkg/utils"
 	"log"
 
 	"git.fd.io/govpp.git"
@@ -60,7 +61,7 @@ func (c *Client) Close() {
 	c.conn.Disconnect()
 }
 
-func (c *Client) CreateBitstream(bitstream *Bitstream) {
+func (c *Client) CreateBitstream(bitstream *Bitstream, prio int) {
 	// If vpp is not enabled return
 	if !c.enabled {
 		return
@@ -73,7 +74,11 @@ func (c *Client) CreateBitstream(bitstream *Bitstream) {
 	sw1, _ := CreateVlan(c.conn, bitstream.DstInterface, bitstream.DstId, bitstream.DstOuter, bitstream.DstInner)
 
 	// Assign Vlan to the same bridge domain
-	CreateBridgeDomain(c.conn, bitstream.SrcId, sw0, sw1)
+
+	outer := utils.ConcatVlanPrio(bitstream.SrcOuter, prio)
+	inner := utils.ConcatVlanPrio(bitstream.SrcInner, prio)
+
+	CreateBridgeDomain(c.conn, bitstream.SrcId, sw0, sw1, outer, inner)
 }
 
 func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (interface_types.InterfaceIndex, error) {
@@ -106,7 +111,8 @@ func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (inter
 	return reply.SwIfIndex, nil
 }
 
-func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.InterfaceIndex, sw1 interface_types.InterfaceIndex) error {
+func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.InterfaceIndex,
+	sw1 interface_types.InterfaceIndex, outer int, inner int) error {
 	ch, err := c.NewAPIChannel()
 	if err != nil {
 		log.Println("ERROR: creating channel failed:", err)
@@ -156,21 +162,13 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	}
 
 	// Pop 2 tags
-	req4 := &l2.L2InterfaceVlanTagRewrite{SwIfIndex: interface_types.InterfaceIndex(sw0), VtrOp: 4}
+	req4 := &l2.L2InterfaceVlanTagRewrite{SwIfIndex: interface_types.InterfaceIndex(sw1), VtrOp: 8,
+		Tag1: uint32(outer), Tag2: uint32(inner), PushDot1q: 1}
 
 	reply4 := &l2.L2InterfaceVlanTagRewriteReply{}
 
 	if err = ch.SendRequest(req4).ReceiveReply(reply4); err != nil {
-		log.Println("ERROR: seting tag rewrite pop2 sw0", err)
-		return err
-	}
-
-	req5 := &l2.L2InterfaceVlanTagRewrite{SwIfIndex: interface_types.InterfaceIndex(sw1), VtrOp: 4}
-
-	reply5 := &l2.L2InterfaceVlanTagRewriteReply{}
-
-	if err = ch.SendRequest(req5).ReceiveReply(reply5); err != nil {
-		log.Println("ERROR: seting tag rewrite pop2 sw1", err)
+		log.Println("ERROR: seting tag rewrite translate 2:2", err)
 		return err
 	}
 

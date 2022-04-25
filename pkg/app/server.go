@@ -13,11 +13,12 @@ type Config struct {
 	SrcInterface int
 	VppEnabled   bool
 	SrcVppSocket string
+	Prio         int
 }
 
 func RunHttpServer(config *Config) {
 	// New gluwholevpp API
-	s := api.New(config.VppEnabled, config.SrcInterface, config.SrcDatabase, config.SrcVppSocket)
+	s := api.New(config.VppEnabled, config.SrcInterface, config.SrcDatabase, config.SrcVppSocket, config.Prio)
 	addr := fmt.Sprintf("%v:%v", config.Address, config.Port)
 
 	fmt.Println("Listening on", addr)
