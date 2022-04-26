@@ -6,6 +6,7 @@ import (
 	"gluwholevpp/pkg/vpp"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -32,6 +33,33 @@ func (a *Api) GetBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
 	var bitstreams []repository.Bitstream
 	err := a.storage.GetBitstreams(&bitstreams)
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 500)
+		return
+	}
+	res := &ResponseBitstreams{}
+	res.Status = 1
+	res.Msg = &bitstreams
+	writeHttpResponseJSON(res, &w, 200)
+}
+
+func (a *Api) GetBitstreamsFromCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	var bitstreams []repository.Bitstream
+	err = a.storage.GetBitstreamsFromCustomer(id, &bitstreams)
 
 	if err != nil {
 		resE := &ResponseGeneric{}

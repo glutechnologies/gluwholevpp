@@ -41,6 +41,35 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 	return nil
 }
 
+func (s *Storage) GetBitstreamsFromCustomer(customerId int, bitstreams *[]Bitstream) error {
+	rows, err := s.db.Query("SELECT Id, CustomerId, SrcId, SrcOuter, SrcInner, DstId, DstOuter, DstInner, Comment FROM bitstreams WHERE customerId = ?", customerId)
+
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		var id string
+		var customerId int
+		var srcId int
+		var srcOuter int
+		var srcInner int
+		var dstId int
+		var dstOuter int
+		var dstInner int
+		var comment string
+
+		err = rows.Scan(&id, &customerId, &srcId, &srcOuter, &srcInner, &dstId, &dstOuter, &dstInner, &comment)
+		if err != nil {
+			return err
+		}
+		(*bitstreams) = append((*bitstreams), Bitstream{Id: id, CustomerId: customerId, SrcId: srcId, SrcOuter: srcOuter,
+			SrcInner: srcInner, DstId: dstId, DstOuter: dstOuter, DstInner: dstInner, Comment: comment})
+	}
+
+	return nil
+}
+
 func (s *Storage) GetBitstream(id string, bitstream *Bitstream) error {
 
 	var customerId int

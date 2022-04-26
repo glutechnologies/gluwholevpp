@@ -34,6 +34,7 @@ func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket str
 	r.HandleFunc("/customers", a.GetCustomersHandler).Methods(http.MethodGet)
 	r.HandleFunc("/customer", a.CreateCustomerHandler).Methods(http.MethodPost)
 	r.HandleFunc("/customer/{id}", a.GetCustomerHandler).Methods(http.MethodGet)
+	r.HandleFunc("/customer/{id}/bitstreams", a.GetBitstreamsFromCustomerHandler).Methods(http.MethodGet)
 
 	// Init DB
 	a.storage.Init(srcDatabase)
