@@ -41,6 +41,42 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 	return nil
 }
 
+func (s *Storage) GetBitstream(id string, bitstream *Bitstream) error {
+
+	var customerId int
+	var srcId int
+	var srcOuter int
+	var srcInner int
+	var dstId int
+	var dstOuter int
+	var dstInner int
+	var comment string
+
+	err := s.db.QueryRow("SELECT Id, CustomerId, SrcId, SrcOuter, SrcInner, DstId, DstOuter, DstInner, Comment FROM bitstreams WHERE Id = ?",
+		id).Scan(&id, &customerId, &srcId, &srcOuter, &srcInner, &dstId, &dstOuter, &dstInner, &comment)
+
+	if err != nil {
+		return err
+	}
+
+	*(bitstream) = Bitstream{Id: id, CustomerId: customerId, SrcId: srcId, SrcOuter: srcOuter,
+		SrcInner: srcInner, DstId: dstId, DstOuter: dstOuter, DstInner: dstInner, Comment: comment}
+
+	return nil
+}
+
+func (s *Storage) DeleteBitstream(id string) error {
+	stmt, err := s.db.Prepare("DELETE FROM bitstreams WHERE Id = ?")
+	if err != nil {
+		return err
+	}
+
+	stmt.Exec(id)
+	defer stmt.Close()
+
+	return nil
+}
+
 func (s *Storage) InsertBitstream(bitstream *Bitstream) error {
 	stmt, err := s.db.Prepare("INSERT INTO bitstreams (Id, CustomerId, SrcId, SrcOuter, SrcInner, DstId, DstOuter, DstInner, Comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {

@@ -81,6 +81,26 @@ func (c *Client) CreateBitstream(bitstream *Bitstream, prio int) {
 	CreateBridgeDomain(c.conn, bitstream.SrcId, sw0, sw1, outer, inner)
 }
 
+func (c *Client) DeleteBitstream(bitstream *Bitstream) {
+	// If vpp is not enabled return
+	if !c.enabled {
+		return
+	}
+
+	// Prepare sub-interface dump
+	ifaces := make(map[int]*interfaces.SwInterfaceDetails)
+	SubInterfaceDump(c.conn, ifaces)
+
+	// Delete Source VLAN
+	DeleteVlan(c.conn, int(ifaces[bitstream.SrcId].SwIfIndex))
+
+	// Delete Dest VLAN
+	DeleteVlan(c.conn, int(ifaces[bitstream.DstId].SwIfIndex))
+
+	// Delete bridge domain
+	DeleteBridgeDomain(c.conn, bitstream.SrcId)
+}
+
 func CreateVlan(c *core.Connection, sw int, id int, outer int, inner int) (interface_types.InterfaceIndex, error) {
 	ch, err := c.NewAPIChannel()
 	if err != nil {
@@ -170,6 +190,80 @@ func CreateBridgeDomain(c *core.Connection, id int, sw0 interface_types.Interfac
 	if err = ch.SendRequest(req4).ReceiveReply(reply4); err != nil {
 		log.Println("ERROR: seting tag rewrite translate 2:2", err)
 		return err
+	}
+
+	return nil
+}
+
+func DeleteVlan(c *core.Connection, sw int) error {
+	ch, err := c.NewAPIChannel()
+	if err != nil {
+		log.Println("ERROR: creating channel failed:", err)
+		return err
+	}
+	defer ch.Close()
+
+	req := &interfaces.DeleteSubif{SwIfIndex: interface_types.InterfaceIndex(sw)}
+
+	reply := &interfaces.DeleteSubifReply{}
+
+	if err = ch.SendRequest(req).ReceiveReply(reply); err != nil {
+		log.Println("ERROR: deleting sub-interface", err)
+		return err
+	}
+
+	return nil
+}
+
+func DeleteBridgeDomain(c *core.Connection, id int) error {
+	ch, err := c.NewAPIChannel()
+	if err != nil {
+		log.Println("ERROR: creating channel failed:", err)
+		return err
+	}
+	defer ch.Close()
+
+	req := &l2.BridgeDomainAddDel{
+		BdID:  uint32(id),
+		IsAdd: false,
+	}
+
+	reply := &l2.BridgeDomainAddDelReply{}
+
+	if err = ch.SendRequest(req).ReceiveReply(reply); err != nil {
+		log.Println("ERROR: deleting bridge-domain", err)
+		return err
+	}
+
+	return nil
+}
+
+func SubInterfaceDump(c *core.Connection, ifaces map[int]*interfaces.SwInterfaceDetails) error {
+	ch, err := c.NewAPIChannel()
+	if err != nil {
+		log.Println("ERROR: creating channel failed:", err)
+		return err
+	}
+	defer ch.Close()
+
+	reqCtx := ch.SendMultiRequest(&interfaces.SwInterfaceDump{
+		SwIfIndex: ^interface_types.InterfaceIndex(0),
+	})
+	for {
+		msg := &interfaces.SwInterfaceDetails{}
+		stop, err := reqCtx.ReceiveReply(msg)
+		if stop {
+			break
+		}
+		if err != nil {
+			log.Println(err, "dumping interfaces")
+			return err
+		}
+
+		// Take only sub-interfaces
+		if msg.SubID != 0 {
+			ifaces[int(msg.SubID)] = msg
+		}
 	}
 
 	return nil

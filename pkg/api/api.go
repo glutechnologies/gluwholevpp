@@ -28,6 +28,7 @@ func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket str
 	// Add endpoints
 	r.HandleFunc("/bitstreams", a.GetBitstreamsHandler).Methods(http.MethodGet)
 	r.HandleFunc("/bitstream", a.CreateBitstreamHandler).Methods(http.MethodPost)
+	r.HandleFunc("/bitstream/{id}", a.DeleteBitstreamHandler).Methods(http.MethodDelete)
 
 	r.HandleFunc("/customers", a.GetCustomersHandler).Methods(http.MethodGet)
 	r.HandleFunc("/customer", a.CreateCustomerHandler).Methods(http.MethodPost)

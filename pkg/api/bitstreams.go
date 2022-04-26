@@ -6,6 +6,8 @@ import (
 	"gluwholevpp/pkg/vpp"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +90,47 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	a.vpp.CreateBitstream(vppBitstream, a.prio)
+
+	res.Status = 1
+	res.Msg = "Ok"
+	writeHttpResponseJSON(res, &w, 200)
+}
+
+func (a *Api) DeleteBitstreamHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var bitstream repository.Bitstream
+
+	err := a.storage.GetBitstream(vars["id"], &bitstream)
+
+	res := &ResponseGeneric{}
+	res.Status = 0
+
+	if err != nil {
+		res.Msg = err.Error()
+		writeHttpResponseJSON(res, &w, 400)
+		return
+	}
+
+	vppBitstream := &vpp.Bitstream{
+		SrcInterface: a.srcInterface,
+		DstInterface: 0,
+		SrcId:        bitstream.SrcId,
+		DstId:        bitstream.DstId,
+		SrcOuter:     bitstream.SrcOuter,
+		SrcInner:     bitstream.SrcInner,
+		DstOuter:     bitstream.DstOuter,
+		DstInner:     bitstream.DstInner,
+	}
+
+	// Delete from DB
+	err = a.storage.DeleteBitstream(bitstream.Id)
+	if err != nil {
+		res.Msg = err.Error()
+		writeHttpResponseJSON(res, &w, 500)
+		return
+	}
+
+	a.vpp.DeleteBitstream(vppBitstream)
 
 	res.Status = 1
 	res.Msg = "Ok"
