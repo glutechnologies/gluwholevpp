@@ -10,6 +10,25 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func (a *Api) GetBitstreamHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var bitstream repository.Bitstream
+
+	err := a.storage.GetBitstream(vars["id"], &bitstream)
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 500)
+		return
+	}
+
+	res := &ResponseBitstream{}
+	res.Status = 1
+	res.Msg = &bitstream
+	writeHttpResponseJSON(res, &w, 200)
+}
+
 func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
 	var bitstreams []repository.Bitstream
 	err := a.storage.GetBitstreams(&bitstreams)
@@ -19,6 +38,7 @@ func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
 		resE.Status = 0
 		resE.Msg = err.Error()
 		writeHttpResponseJSON(resE, &w, 500)
+		return
 	}
 	res := &ResponseBitstreams{}
 	res.Status = 1

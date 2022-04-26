@@ -33,8 +33,8 @@ func (r *ResponseGeneric) GetStatus() int {
 }
 
 type ResponseBitstreams struct {
-	Status int
-	Msg    *[]repository.Bitstream
+	Status int                     `json:"status"`
+	Msg    *[]repository.Bitstream `json:"msg"`
 }
 
 func (r *ResponseBitstreams) GetMsg() string {
@@ -46,9 +46,23 @@ func (r *ResponseBitstreams) GetStatus() int {
 	return r.Status
 }
 
+type ResponseBitstream struct {
+	Status int                   `json:"status"`
+	Msg    *repository.Bitstream `json:"msg"`
+}
+
+func (r *ResponseBitstream) GetMsg() string {
+	res, _ := json.Marshal(r.Msg)
+	return string(res)
+}
+
+func (r *ResponseBitstream) GetStatus() int {
+	return r.Status
+}
+
 type ResponseCustomers struct {
-	Status int
-	Msg    *[]repository.Customer
+	Status int                    `json:"status"`
+	Msg    *[]repository.Customer `json:"msg"`
 }
 
 func (r *ResponseCustomers) GetMsg() string {
