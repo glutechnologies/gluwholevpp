@@ -75,8 +75,8 @@ func (r *ResponseCustomers) GetStatus() int {
 }
 
 type ResponseCustomer struct {
-	Status int
-	Msg    *repository.Customer
+	Status int                  `json:"status"`
+	Msg    *repository.Customer `json:"msg"`
 }
 
 func (r *ResponseCustomer) GetMsg() string {
