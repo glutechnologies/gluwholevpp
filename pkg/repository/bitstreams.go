@@ -1,11 +1,11 @@
 package repository
 
 type Bitstream struct {
-	Id         string `json:"id"`
-	CustomerId string `json:"customer-id"`
+	Id         string `json:"id" validate:"required"`
+	CustomerId string `json:"customer-id" validate:"required"`
 	SrcId      int    `json:"src-id"`
-	SrcOuter   int    `json:"src-outer"`
-	SrcInner   int    `json:"src-inner"`
+	SrcOuter   int    `json:"src-outer" validate:"required"`
+	SrcInner   int    `json:"src-inner" validate:"required"`
 	DstId      int    `json:"dst-id"`
 	DstOuter   int    `json:"dst-outer"`
 	DstInner   int    `json:"dst-inner"`

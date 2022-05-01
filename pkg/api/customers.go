@@ -5,6 +5,7 @@ import (
 	"gluwholevpp/pkg/repository"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -92,6 +93,16 @@ func (a *Api) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := &ResponseGeneric{}
 	res.Status = 0
+
+	if err != nil {
+		res.Msg = err.Error()
+		writeHttpResponseJSON(res, &w, 400)
+		return
+	}
+
+	// v10 validator for structs
+	validate := validator.New()
+	err = validate.Struct(customer)
 
 	if err != nil {
 		res.Msg = err.Error()

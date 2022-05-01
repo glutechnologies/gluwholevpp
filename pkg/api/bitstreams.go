@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -72,6 +73,16 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := &ResponseGeneric{}
 	res.Status = 0
+
+	if err != nil {
+		res.Msg = err.Error()
+		writeHttpResponseJSON(res, &w, 400)
+		return
+	}
+
+	// v10 validator for structs
+	validate := validator.New()
+	err = validate.Struct(bitstream)
 
 	if err != nil {
 		res.Msg = err.Error()

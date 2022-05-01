@@ -1,10 +1,10 @@
 package repository
 
 type Customer struct {
-	Id             string `json:"id"`
-	Name           string `json:"name"`
-	OuterInterface int    `json:"outer-interface"`
-	OuterVlan      int    `json:"outer-vlan"`
+	Id             string `json:"id" validate:"required"`
+	Name           string `json:"name" validate:"required"`
+	OuterInterface int    `json:"outer-interface" validate:"required"`
+	OuterVlan      int    `json:"outer-vlan" validate:"required"`
 	Counter        int    `json:"counter"`
 }
 
