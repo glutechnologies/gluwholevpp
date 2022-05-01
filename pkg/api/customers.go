@@ -54,6 +54,53 @@ func (a *Api) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+func (a *Api) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	var bitstreams []repository.Bitstream
+	err = a.storage.GetBitstreamsFromCustomer(id, &bitstreams)
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	if len(bitstreams) > 0 {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = "Existing bitstreams for this customer"
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	err = a.storage.DeleteCustomer(id)
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 500)
+		return
+	}
+
+	res := &ResponseGeneric{}
+	res.Status = 1
+	res.Msg = "Ok"
+	writeHttpResponseJSON(res, &w, 200)
+}
+
 func (a *Api) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	var customer repository.Customer
 	err := json.NewDecoder(r.Body).Decode(&customer)

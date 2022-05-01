@@ -89,3 +89,15 @@ func (s *Storage) InsertCustomer(customer *Customer) error {
 
 	return nil
 }
+
+func (s *Storage) DeleteCustomer(id int) error {
+	stmt, err := s.db.Prepare("DELETE FROM customers WHERE Id = ?")
+	if err != nil {
+		return err
+	}
+
+	stmt.Exec(id)
+	defer stmt.Close()
+
+	return nil
+}
