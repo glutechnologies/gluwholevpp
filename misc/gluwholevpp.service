@@ -1,0 +1,16 @@
+[Unit]
+Description=Glutec Wholesale VPP Control Plane
+After=vpp.service
+PartOf=vpp.service
+
+[Service]
+Type=simple
+TimeoutStartSec=30
+ExecStartPre=/bin/sleep 20
+ExecStart=/opt/glutec/gluwholevpp/gluwholevpp --config /opt/glutec/gluwholevpp/gluwholevpp.toml
+Restart=always
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target
+
