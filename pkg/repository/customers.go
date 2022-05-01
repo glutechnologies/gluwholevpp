@@ -1,7 +1,7 @@
 package repository
 
 type Customer struct {
-	Id             int    `json:"id"`
+	Id             string `json:"id"`
 	Name           string `json:"name"`
 	OuterInterface int    `json:"outer-interface"`
 	OuterVlan      int    `json:"outer-vlan"`
@@ -15,7 +15,7 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 		return err
 	}
 
-	var id int
+	var id string
 	var name string
 	var outerInterface int
 	var outerVlan int
@@ -33,8 +33,8 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 	return nil
 }
 
-func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
-	var id int
+func (s *Storage) GetCustomer(customerId string, customer *Customer) error {
+	var id string
 	var name string
 	var outerInterface int
 	var outerVlan int
@@ -56,7 +56,7 @@ func (s *Storage) GetCustomer(customerId int, customer *Customer) error {
 	return nil
 }
 
-func (s *Storage) IncrementCounterCustomer(customerId int) (int, error) {
+func (s *Storage) IncrementCounterCustomer(customerId string) (int, error) {
 	var counter int
 	tx, _ := s.db.Begin()
 	err := tx.QueryRow("SELECT Counter FROM customers WHERE Id = ?", customerId).Scan(&counter)
@@ -79,18 +79,22 @@ func (s *Storage) IncrementCounterCustomer(customerId int) (int, error) {
 }
 
 func (s *Storage) InsertCustomer(customer *Customer) error {
-	stmt, err := s.db.Prepare("INSERT INTO customers (Name, OuterInterface, OuterVlan) VALUES (?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO customers (Id, Name, OuterInterface, OuterVlan) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		return err
 	}
 
-	stmt.Exec(customer.Name, customer.OuterInterface, customer.OuterVlan)
+	_, err = stmt.Exec(customer.Id, customer.Name, customer.OuterInterface, customer.OuterVlan)
 	defer stmt.Close()
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (s *Storage) DeleteCustomer(id int) error {
+func (s *Storage) DeleteCustomer(id string) error {
 	stmt, err := s.db.Prepare("DELETE FROM customers WHERE Id = ?")
 	if err != nil {
 		return err

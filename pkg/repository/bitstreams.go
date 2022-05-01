@@ -2,7 +2,7 @@ package repository
 
 type Bitstream struct {
 	Id         string `json:"id"`
-	CustomerId int    `json:"customer-id"`
+	CustomerId string `json:"customer-id"`
 	SrcId      int    `json:"src-id"`
 	SrcOuter   int    `json:"src-outer"`
 	SrcInner   int    `json:"src-inner"`
@@ -20,7 +20,7 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 	}
 
 	var id string
-	var customerId int
+	var customerId string
 	var srcId int
 	var srcOuter int
 	var srcInner int
@@ -41,7 +41,7 @@ func (s *Storage) GetBitstreams(bitstreams *[]Bitstream) error {
 	return nil
 }
 
-func (s *Storage) GetBitstreamsFromCustomer(customerId int, bitstreams *[]Bitstream) error {
+func (s *Storage) GetBitstreamsFromCustomer(customerId string, bitstreams *[]Bitstream) error {
 	rows, err := s.db.Query("SELECT Id, CustomerId, SrcId, SrcOuter, SrcInner, DstId, DstOuter, DstInner, Comment FROM bitstreams WHERE customerId = ?", customerId)
 
 	if err != nil {
@@ -50,7 +50,7 @@ func (s *Storage) GetBitstreamsFromCustomer(customerId int, bitstreams *[]Bitstr
 
 	for rows.Next() {
 		var id string
-		var customerId int
+		var customerId string
 		var srcId int
 		var srcOuter int
 		var srcInner int
@@ -72,7 +72,7 @@ func (s *Storage) GetBitstreamsFromCustomer(customerId int, bitstreams *[]Bitstr
 
 func (s *Storage) GetBitstream(id string, bitstream *Bitstream) error {
 
-	var customerId int
+	var customerId string
 	var srcId int
 	var srcOuter int
 	var srcInner int

@@ -3,7 +3,7 @@
 -- Bitstreams
 CREATE TABLE "bitstreams" (
 	"Id"	TEXT,
-	"CustomerId"	INTEGER NOT NULL,
+	"CustomerId"	TEXT NOT NULL,
 	"SrcId"	INTEGER NOT NULL,
 	"SrcOuter"	INTEGER NOT NULL,
 	"SrcInner"	INTEGER NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE "bitstreams" (
 
 -- Customers
 CREATE TABLE "customers" (
-	"Id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"Id"	TEXT PRIMARY KEY,
 	"Name"	INTEGER NOT NULL,
 	"OuterInterface"	INTEGER NOT NULL,
 	"OuterVlan"	INTEGER NOT NULL,

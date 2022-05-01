@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"gluwholevpp/pkg/repository"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -29,17 +28,10 @@ func (a *Api) GetCustomersHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		resE := &ResponseGeneric{}
-		resE.Status = 0
-		resE.Msg = err.Error()
-		writeHttpResponseJSON(resE, &w, 400)
-		return
-	}
+	id := vars["id"]
 
 	var customer repository.Customer
-	err = a.storage.GetCustomer(id, &customer)
+	err := a.storage.GetCustomer(id, &customer)
 
 	if err != nil {
 		resE := &ResponseGeneric{}
@@ -57,17 +49,10 @@ func (a *Api) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 func (a *Api) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		resE := &ResponseGeneric{}
-		resE.Status = 0
-		resE.Msg = err.Error()
-		writeHttpResponseJSON(resE, &w, 400)
-		return
-	}
+	id := vars["id"]
 
 	var bitstreams []repository.Bitstream
-	err = a.storage.GetBitstreamsFromCustomer(id, &bitstreams)
+	err := a.storage.GetBitstreamsFromCustomer(id, &bitstreams)
 
 	if err != nil {
 		resE := &ResponseGeneric{}
