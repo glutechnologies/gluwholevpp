@@ -4,8 +4,8 @@ type Customer struct {
 	Id             string `json:"id" validate:"required"`
 	Name           string `json:"name" validate:"required"`
 	OuterInterface int    `json:"outer-interface" validate:"required"`
-	OuterVlan      int    `json:"outer-vlan" validate:"required"`
-	Counter        int    `json:"counter"`
+	OuterVlan      int    `json:"outer-vlan" validate:"required,gte=2,lte=4094"`
+	Counter        int    `json:"counter" validate:"gte=2,lte=4094"`
 }
 
 func (s *Storage) GetCustomers(customers *[]Customer) error {
@@ -100,8 +100,27 @@ func (s *Storage) DeleteCustomer(id string) error {
 		return err
 	}
 
-	stmt.Exec(id)
+	_, err = stmt.Exec(id)
 	defer stmt.Close()
 
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Storage) UpdateCustomer(customer *Customer) error {
+	stmt, err := s.db.Prepare("UPDATE customers SET Name = ?, OuterInterface = ?, OuterVlan = ?, Counter = ? WHERE Id = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(customer.Name, customer.OuterInterface, customer.OuterVlan, customer.Counter, customer.Id)
+	defer stmt.Close()
+
+	if err != nil {
+		return err
+	}
 	return nil
 }

@@ -122,3 +122,62 @@ func (a *Api) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	res.Msg = "ok"
 	writeHttpResponseJSON(res, &w, 200)
 }
+
+func (a *Api) PatchCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id := vars["id"]
+
+	var customer repository.Customer
+	err := a.storage.GetCustomer(id, &customer)
+
+	res := &ResponseGeneric{}
+	res.Status = 0
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	// Decode body
+	err = json.NewDecoder(r.Body).Decode(&customer)
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	// Invalidate Id from decoder
+	customer.Id = id
+
+	// v10 validator for structs
+	validate := validator.New()
+	err = validate.Struct(customer)
+
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 400)
+		return
+	}
+
+	err = a.storage.UpdateCustomer(&customer)
+	if err != nil {
+		resE := &ResponseGeneric{}
+		resE.Status = 0
+		resE.Msg = err.Error()
+		writeHttpResponseJSON(resE, &w, 500)
+		return
+	}
+
+	res.Status = 1
+	res.Msg = "Ok"
+	writeHttpResponseJSON(res, &w, 200)
+}
