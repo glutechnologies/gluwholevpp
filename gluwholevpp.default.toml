@@ -5,5 +5,3 @@ SrcInterface = 1
 # Set VppEnabled to false for development purposes only
 VppEnabled = true
 SrcVppSocket = "/var/run/vpp/api.sock"
-# Source priority for Bitstreams
-Prio = 3

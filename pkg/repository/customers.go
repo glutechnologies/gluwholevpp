@@ -6,10 +6,11 @@ type Customer struct {
 	OuterInterface int    `json:"outer-interface" validate:"required"`
 	OuterVlan      int    `json:"outer-vlan" validate:"required,gte=2,lte=4094"`
 	Counter        int    `json:"counter" validate:"gte=2,lte=4094"`
+	Prio           int    `json:"prio" validate:"gte=0,lte=7"`
 }
 
 func (s *Storage) GetCustomers(customers *[]Customer) error {
-	rows, err := s.db.Query("SELECT Id, Name, OuterInterface, OuterVlan, Counter FROM customers")
+	rows, err := s.db.Query("SELECT Id, Name, OuterInterface, OuterVlan, Counter, Prio FROM customers")
 
 	if err != nil {
 		return err
@@ -20,14 +21,15 @@ func (s *Storage) GetCustomers(customers *[]Customer) error {
 	var outerInterface int
 	var outerVlan int
 	var counter int
+	var prio int
 
 	for rows.Next() {
-		err = rows.Scan(&id, &name, &outerInterface, &outerVlan, &counter)
+		err = rows.Scan(&id, &name, &outerInterface, &outerVlan, &counter, &prio)
 		if err != nil {
 			return err
 		}
 		(*customers) = append((*customers), Customer{Id: id, Name: name, OuterInterface: outerInterface,
-			OuterVlan: outerVlan, Counter: counter})
+			OuterVlan: outerVlan, Counter: counter, Prio: prio})
 	}
 
 	return nil
@@ -39,7 +41,9 @@ func (s *Storage) GetCustomer(customerId string, customer *Customer) error {
 	var outerInterface int
 	var outerVlan int
 	var counter int
-	err := s.db.QueryRow("SELECT Id, Name, OuterInterface, OuterVlan, Counter FROM customers WHERE Id = ?", customerId).Scan(&id, &name, &outerInterface, &outerVlan, &counter)
+	var prio int
+	err := s.db.QueryRow("SELECT Id, Name, OuterInterface, OuterVlan, Counter, Prio FROM customers WHERE Id = ?",
+		customerId).Scan(&id, &name, &outerInterface, &outerVlan, &counter, &prio)
 
 	if err != nil {
 		return err
@@ -51,6 +55,7 @@ func (s *Storage) GetCustomer(customerId string, customer *Customer) error {
 		OuterInterface: outerInterface,
 		OuterVlan:      outerVlan,
 		Counter:        counter,
+		Prio:           prio,
 	}
 
 	return nil
@@ -111,12 +116,12 @@ func (s *Storage) DeleteCustomer(id string) error {
 }
 
 func (s *Storage) UpdateCustomer(customer *Customer) error {
-	stmt, err := s.db.Prepare("UPDATE customers SET Name = ?, OuterInterface = ?, OuterVlan = ?, Counter = ? WHERE Id = ?")
+	stmt, err := s.db.Prepare("UPDATE customers SET Name = ?, OuterInterface = ?, OuterVlan = ?, Counter = ?, Prio = ? WHERE Id = ?")
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(customer.Name, customer.OuterInterface, customer.OuterVlan, customer.Counter, customer.Id)
+	_, err = stmt.Exec(customer.Name, customer.OuterInterface, customer.OuterVlan, customer.Counter, customer.Prio, customer.Id)
 	defer stmt.Close()
 
 	if err != nil {

@@ -140,7 +140,7 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 		DstInner:     bitstream.DstInner,
 	}
 
-	a.vpp.CreateBitstream(vppBitstream, a.prio)
+	a.vpp.CreateBitstream(vppBitstream, customer.Prio)
 
 	res.Status = 1
 	res.Msg = "Ok"
@@ -216,7 +216,7 @@ func (a *Api) LoadBitstreamsStorage() error {
 			DstOuter:     v.DstOuter,
 			DstInner:     v.DstInner,
 		}
-		a.vpp.CreateBitstream(bitstream, a.prio)
+		a.vpp.CreateBitstream(bitstream, customer.Prio)
 	}
 
 	return nil

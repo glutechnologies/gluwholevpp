@@ -13,7 +13,6 @@ type Api struct {
 	storage      repository.Storage
 	vpp          vpp.Client
 	srcInterface int
-	prio         int
 }
 
 type Server interface {
@@ -21,8 +20,8 @@ type Server interface {
 	Close() error
 }
 
-func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket string, prio int) Server {
-	a := &Api{srcInterface: srcInterface, prio: prio}
+func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket string) Server {
+	a := &Api{srcInterface: srcInterface}
 	r := mux.NewRouter()
 
 	// Add endpoints

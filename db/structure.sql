@@ -23,6 +23,7 @@ CREATE TABLE "customers" (
 	"OuterInterface"	INTEGER NOT NULL,
 	"OuterVlan"	INTEGER NOT NULL,
 	"Counter"	INTEGER NOT NULL DEFAULT 2,
+	"Prio"		INTEGER NOT NULL DEFAULT 3,
     UNIQUE(OuterInterface, OuterVlan)
 );
 
