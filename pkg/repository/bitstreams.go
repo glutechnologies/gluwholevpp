@@ -4,8 +4,8 @@ type Bitstream struct {
 	Id         string `json:"id" validate:"required"`
 	CustomerId string `json:"customer-id" validate:"required"`
 	SrcId      int    `json:"src-id"`
-	SrcOuter   int    `json:"src-outer" validate:"required"`
-	SrcInner   int    `json:"src-inner" validate:"required"`
+	SrcOuter   int    `json:"src-outer" validate:"required,gte=2,lte=4094"`
+	SrcInner   int    `json:"src-inner" validate:"required,gte=2,lte=4094"`
 	DstId      int    `json:"dst-id"`
 	DstOuter   int    `json:"dst-outer"`
 	DstInner   int    `json:"dst-inner"`
