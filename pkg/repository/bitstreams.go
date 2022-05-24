@@ -1,5 +1,6 @@
 package repository
 
+// swagger:model Bitstream
 type Bitstream struct {
 	Id         string `json:"id" validate:"required"`
 	CustomerId string `json:"customer-id" validate:"required"`

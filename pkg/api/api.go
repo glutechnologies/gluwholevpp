@@ -1,3 +1,16 @@
+//  GluWholeVPP API
+//
+//  Schemes: http
+//  BasePath: /
+//  Version: 1.0.0
+//
+//  Consumes:
+//  - application/json
+//
+//  Produces:
+//  - application/json
+//
+// swagger:meta
 package api
 
 import (
@@ -5,6 +18,7 @@ import (
 	"gluwholevpp/pkg/vpp"
 	"net/http"
 
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -23,6 +37,13 @@ type Server interface {
 func New(vppEnabled bool, srcInterface int, srcDatabase string, srcVppSocket string) Server {
 	a := &Api{srcInterface: srcInterface}
 	r := mux.NewRouter()
+
+	r.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+
+	// Documentation for developers
+	opts := middleware.SwaggerUIOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.SwaggerUI(opts, nil)
+	r.Handle("/docs", sh)
 
 	// Add endpoints
 	r.HandleFunc("/bitstreams", a.GetBitstreamsHandler).Methods(http.MethodGet)

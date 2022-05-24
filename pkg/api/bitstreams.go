@@ -11,6 +11,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// swagger:route GET /bitstream/{id} bitstream getBitstream
+// Get bitstream information
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseBitstream
 func (a *Api) GetBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var bitstream repository.Bitstream
@@ -30,6 +37,13 @@ func (a *Api) GetBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route GET /bitstreams bitstream getBitstreams
+// Get a list of all bitstreams
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseBitstreams
 func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
 	var bitstreams []repository.Bitstream
 	err := a.storage.GetBitstreams(&bitstreams)
@@ -47,6 +61,13 @@ func (a *Api) GetBitstreamsHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route GET /customer/{id}/bitstreams customer getBitstreams
+// Get a list of all bitstreams from a customer
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseBitstreams
 func (a *Api) GetBitstreamsFromCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -67,6 +88,39 @@ func (a *Api) GetBitstreamsFromCustomerHandler(w http.ResponseWriter, r *http.Re
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route POST /bitstream bitstream createBitstream
+//  Create a bitstream
+//
+// parameters:
+//   + name: id
+//      in: body
+//      description: Unique identifier for bitstream
+//      required: true
+//      type: string
+//	+ name: customer-id
+//      in: body
+//      description: Unique identifier for customer
+//      required: true
+//      type: string
+//	+ name: src-outer
+//      in: body
+//      description: Outer source VLAN (S-VLAN)
+//      required: true
+//      type: int
+//  + name: src-inner
+//      in: body
+//      description: Inner source VLAN (C-VLAN)
+//      required: true
+//      type: string
+//  + name: comment
+//      in: body
+//      description: Optional comment for the bitstream
+//      type: string
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseGeneric
 func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	var bitstream repository.Bitstream
 	err := json.NewDecoder(r.Body).Decode(&bitstream)
@@ -147,6 +201,13 @@ func (a *Api) CreateBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route DELETE /bitstream/{id} bitstream deleteBitstream
+// Delete given bitstream by id
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseGeneric
 func (a *Api) DeleteBitstreamHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var bitstream repository.Bitstream

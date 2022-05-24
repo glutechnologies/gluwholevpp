@@ -9,6 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// swagger:route GET /customers/ customer getCustomers
+// Get a list of all customers
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseCustomers
 func (a *Api) GetCustomersHandler(w http.ResponseWriter, r *http.Request) {
 	var customers []repository.Customer
 	err := a.storage.GetCustomers(&customers)
@@ -26,6 +33,13 @@ func (a *Api) GetCustomersHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route GET /customer/{id} customer getCustomer
+// Get customer information
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseCustomer
 func (a *Api) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -47,6 +61,13 @@ func (a *Api) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route DELETE /customer/{id} customer deleteCustomer
+// Delete given customer by id
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseGeneric
 func (a *Api) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -87,6 +108,40 @@ func (a *Api) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route POST /customer customer createCustomer
+//  Create a customer
+//
+// parameters:
+//  + name: id
+//      in: body
+//      description: Unique identifier for customer
+//      required: true
+//      type: string
+//	+ name: name
+//      in: body
+//      description: Name for customer
+//      required: true
+//      type: string
+//	+ name: outer-interface
+//      in: body
+//      description: Outer interface id from VPP Dataplane
+//      required: true
+//      type: int
+//  + name: outer-vlan
+//      in: body
+//      description: Outer destination VLAN for customer (S-VLAN) where all customer's bitstreams will be included
+//      required: true
+//      type: int
+//  + name: counter
+//      in: body
+//      description: C-VLAN counter incremented for each new bitstream
+//      required: true
+//      type: int
+//
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseGeneric
 func (a *Api) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	var customer repository.Customer
 	err := json.NewDecoder(r.Body).Decode(&customer)
@@ -123,6 +178,34 @@ func (a *Api) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	writeHttpResponseJSON(res, &w, 200)
 }
 
+// swagger:route PATCH /customer/{id} customer createCustomer
+//  Patch given customer with new values from body
+//
+// parameters:
+//	+ name: name
+//      in: body
+//      description: Name for customer
+//      required: true
+//      type: string
+//	+ name: outer-interface
+//      in: body
+//      description: Outer interface id from VPP Dataplane
+//      required: true
+//      type: int
+//  + name: outer-vlan
+//      in: body
+//      description: Outer destination VLAN for customer (S-VLAN) where all customer's bitstreams will be included
+//      required: true
+//      type: int
+//  + name: counter
+//      in: body
+//      description: C-VLAN counter incremented for each new bitstream
+//      required: true
+//      type: int
+// responses:
+//  401: ResponseGeneric
+//	500: ResponseGeneric
+//  200: ResponseGeneric
 func (a *Api) PatchCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

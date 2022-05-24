@@ -1,0 +1,431 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  Bitstream:
+    properties:
+      comment:
+        type: string
+        x-go-name: Comment
+      customer-id:
+        type: string
+        x-go-name: CustomerId
+      dst-id:
+        format: int64
+        type: integer
+        x-go-name: DstId
+      dst-inner:
+        format: int64
+        type: integer
+        x-go-name: DstInner
+      dst-outer:
+        format: int64
+        type: integer
+        x-go-name: DstOuter
+      id:
+        type: string
+        x-go-name: Id
+      src-id:
+        format: int64
+        type: integer
+        x-go-name: SrcId
+      src-inner:
+        format: int64
+        type: integer
+        x-go-name: SrcInner
+      src-outer:
+        format: int64
+        type: integer
+        x-go-name: SrcOuter
+    type: object
+    x-go-package: gluwholevpp/pkg/repository
+  Customer:
+    properties:
+      counter:
+        format: int64
+        type: integer
+        x-go-name: Counter
+      id:
+        type: string
+        x-go-name: Id
+      name:
+        type: string
+        x-go-name: Name
+      outer-interface:
+        format: int64
+        type: integer
+        x-go-name: OuterInterface
+      outer-vlan:
+        format: int64
+        type: integer
+        x-go-name: OuterVlan
+      prio:
+        format: int64
+        type: integer
+        x-go-name: Prio
+    type: object
+    x-go-package: gluwholevpp/pkg/repository
+  ResponseBitstream:
+    properties:
+      msg:
+        $ref: '#/definitions/Bitstream'
+      status:
+        format: int64
+        type: integer
+        x-go-name: Status
+    type: object
+    x-go-package: gluwholevpp/pkg/api
+  ResponseBitstreams:
+    properties:
+      msg:
+        items:
+          $ref: '#/definitions/Bitstream'
+        type: array
+        x-go-name: Msg
+      status:
+        format: int64
+        type: integer
+        x-go-name: Status
+    type: object
+    x-go-package: gluwholevpp/pkg/api
+  ResponseCustomer:
+    properties:
+      msg:
+        $ref: '#/definitions/Customer'
+      status:
+        format: int64
+        type: integer
+        x-go-name: Status
+    type: object
+    x-go-package: gluwholevpp/pkg/api
+  ResponseCustomers:
+    properties:
+      msg:
+        items:
+          $ref: '#/definitions/Customer'
+        type: array
+        x-go-name: Msg
+      status:
+        format: int64
+        type: integer
+        x-go-name: Status
+    type: object
+    x-go-package: gluwholevpp/pkg/api
+  ResponseGeneric:
+    properties:
+      msg:
+        type: string
+        x-go-name: Msg
+      status:
+        format: int64
+        type: integer
+        x-go-name: Status
+    type: object
+    x-go-package: gluwholevpp/pkg/api
+info:
+  description: GluWholeVPP API
+  version: 1.0.0
+paths:
+  /bitstream:
+    post:
+      description: Create a bitstream
+      operationId: createBitstream
+      parameters:
+      - description: Unique identifier for bitstream
+        in: body
+        name: id
+        required: true
+        schema:
+          description: Unique identifier for bitstream
+          type: string
+      - description: Unique identifier for customer
+        in: body
+        name: customer-id
+        required: true
+        schema:
+          description: Unique identifier for customer
+          type: string
+      - description: Outer source VLAN (S-VLAN)
+        in: body
+        name: src-outer
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: Outer source VLAN (S-VLAN)
+          type: object
+      - description: Inner source VLAN (C-VLAN)
+        in: body
+        name: src-inner
+        required: true
+        schema:
+          description: Inner source VLAN (C-VLAN)
+          type: string
+      - description: Optional comment for the bitstream
+        in: body
+        name: comment
+        schema:
+          description: Optional comment for the bitstream
+          type: string
+      responses:
+        "200":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - bitstream
+  /bitstream/{id}:
+    delete:
+      description: Delete given bitstream by id
+      operationId: deleteBitstream
+      responses:
+        "200":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - bitstream
+    get:
+      description: Get bitstream information
+      operationId: getBitstream
+      responses:
+        "200":
+          description: ResponseBitstream
+          schema:
+            $ref: '#/definitions/ResponseBitstream'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - bitstream
+  /bitstreams:
+    get:
+      description: Get a list of all bitstreams
+      operationId: getBitstreams
+      responses:
+        "200":
+          description: ResponseBitstreams
+          schema:
+            $ref: '#/definitions/ResponseBitstreams'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - bitstream
+  /customer:
+    post:
+      description: Create a customer
+      operationId: createCustomer
+      parameters:
+      - description: Unique identifier for customer
+        in: body
+        name: id
+        required: true
+        schema:
+          description: Unique identifier for customer
+          type: string
+      - description: Name for customer
+        in: body
+        name: name
+        required: true
+        schema:
+          description: Name for customer
+          type: string
+      - description: Outer interface id from VPP Dataplane
+        in: body
+        name: outer-interface
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: Outer interface id from VPP Dataplane
+          type: object
+      - description: Outer destination VLAN for customer (S-VLAN) where all customer's
+          bitstreams will be included
+        in: body
+        name: outer-vlan
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: Outer destination VLAN for customer (S-VLAN) where all customer's
+            bitstreams will be included
+          type: object
+      - description: C-VLAN counter incremented for each new bitstream
+        in: body
+        name: counter
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: C-VLAN counter incremented for each new bitstream
+          type: object
+      responses:
+        "200":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+  /customer/{id}:
+    delete:
+      description: Delete given customer by id
+      operationId: deleteCustomer
+      responses:
+        "200":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+    get:
+      description: Get customer information
+      operationId: getCustomer
+      responses:
+        "200":
+          description: ResponseCustomer
+          schema:
+            $ref: '#/definitions/ResponseCustomer'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+    patch:
+      description: Patch given customer with new values from body
+      operationId: createCustomer
+      parameters:
+      - description: Name for customer
+        in: body
+        name: name
+        required: true
+        schema:
+          description: Name for customer
+          type: string
+      - description: Outer interface id from VPP Dataplane
+        in: body
+        name: outer-interface
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: Outer interface id from VPP Dataplane
+          type: object
+      - description: Outer destination VLAN for customer (S-VLAN) where all customer's
+          bitstreams will be included
+        in: body
+        name: outer-vlan
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: Outer destination VLAN for customer (S-VLAN) where all customer's
+            bitstreams will be included
+          type: object
+      - description: C-VLAN counter incremented for each new bitstream
+        in: body
+        name: counter
+        required: true
+        schema:
+          $ref: '#/definitions/int'
+          description: C-VLAN counter incremented for each new bitstream
+          type: object
+      responses:
+        "200":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+  /customer/{id}/bitstreams:
+    get:
+      description: Get a list of all bitstreams from a customer
+      operationId: getBitstreams
+      responses:
+        "200":
+          description: ResponseBitstreams
+          schema:
+            $ref: '#/definitions/ResponseBitstreams'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+  /customers/:
+    get:
+      description: Get a list of all customers
+      operationId: getCustomers
+      responses:
+        "200":
+          description: ResponseCustomers
+          schema:
+            $ref: '#/definitions/ResponseCustomers'
+        "401":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+        "500":
+          description: ResponseGeneric
+          schema:
+            $ref: '#/definitions/ResponseGeneric'
+      tags:
+      - customer
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"

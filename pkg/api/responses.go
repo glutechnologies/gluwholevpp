@@ -11,6 +11,7 @@ type Response interface {
 	GetStatus() int
 }
 
+// swagger:model ResponseGeneric
 type ResponseGeneric struct {
 	Status int    `json:"status"`
 	Msg    string `json:"msg"`
@@ -32,6 +33,7 @@ func (r *ResponseGeneric) GetStatus() int {
 	return r.Status
 }
 
+// swagger:model ResponseBitstreams
 type ResponseBitstreams struct {
 	Status int                     `json:"status"`
 	Msg    *[]repository.Bitstream `json:"msg"`
@@ -46,6 +48,7 @@ func (r *ResponseBitstreams) GetStatus() int {
 	return r.Status
 }
 
+// swagger:model ResponseBitstream
 type ResponseBitstream struct {
 	Status int                   `json:"status"`
 	Msg    *repository.Bitstream `json:"msg"`
@@ -60,6 +63,7 @@ func (r *ResponseBitstream) GetStatus() int {
 	return r.Status
 }
 
+// swagger:model ResponseCustomers
 type ResponseCustomers struct {
 	Status int                    `json:"status"`
 	Msg    *[]repository.Customer `json:"msg"`
@@ -74,6 +78,7 @@ func (r *ResponseCustomers) GetStatus() int {
 	return r.Status
 }
 
+// swagger:model ResponseCustomer
 type ResponseCustomer struct {
 	Status int                  `json:"status"`
 	Msg    *repository.Customer `json:"msg"`
