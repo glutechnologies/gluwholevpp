@@ -1,5 +1,7 @@
 package repository
 
+import "errors"
+
 type Customer struct {
 	Id             string `json:"id" validate:"required"`
 	Name           string `json:"name" validate:"required"`
@@ -69,6 +71,11 @@ func (s *Storage) IncrementCounterCustomer(customerId string) (int, error) {
 	if err != nil {
 		tx.Rollback()
 		return counter, err
+	}
+
+	// Maximum VLAN ID
+	if (counter + 1) < 4094 {
+		return 0, errors.New("maximum counter reached: > 4094. no more bitstreams available for this customer")
 	}
 
 	_, err = tx.Exec("UPDATE customers SET Counter = ? WHERE Id = ?", counter+1, customerId)
