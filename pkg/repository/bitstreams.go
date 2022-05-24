@@ -100,8 +100,12 @@ func (s *Storage) DeleteBitstream(id string) error {
 		return err
 	}
 
-	stmt.Exec(id)
+	_, err = stmt.Exec(id)
 	defer stmt.Close()
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -112,8 +116,12 @@ func (s *Storage) InsertBitstream(bitstream *Bitstream) error {
 		return err
 	}
 
-	stmt.Exec(bitstream.Id, bitstream.CustomerId, bitstream.SrcId, bitstream.SrcOuter, bitstream.SrcInner, bitstream.DstId, bitstream.DstOuter, bitstream.DstInner, bitstream.Comment)
+	_, err = stmt.Exec(bitstream.Id, bitstream.CustomerId, bitstream.SrcId, bitstream.SrcOuter, bitstream.SrcInner, bitstream.DstId, bitstream.DstOuter, bitstream.DstInner, bitstream.Comment)
 	defer stmt.Close()
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
