@@ -75,7 +75,7 @@ func (s *Storage) IncrementCounterCustomer(customerId string) (int, error) {
 	}
 
 	// Maximum VLAN ID
-	if (counter + 1) < 4094 {
+	if (counter + 1) > 4094 {
 		return 0, errors.New("maximum counter reached: > 4094. no more bitstreams available for this customer")
 	}
 
